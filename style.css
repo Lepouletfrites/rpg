@@ -1,0 +1,139 @@
+/* style.css - Refonte Complète */
+:root {
+    --bg-color: #1a1a2e;
+    --card-bg: #16213e;
+    --accent: #e94560;
+    --text: #ecf0f1;
+    --mp-color: #0f3460;
+    --hp-color: #e94560;
+    --gold: #ffd700;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text);
+    font-family: 'Roboto', sans-serif; /* Police texte général */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Infos du haut (Vague, XP) */
+#game-info {
+    font-family: 'Press Start 2P', cursive; /* Police Rétro */
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px 30px;
+    border-radius: 15px;
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+.game-container {
+    width: 90%;
+    max-width: 800px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Zone de combat (Héros vs Monstre) */
+.battle-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Pour mobile */
+}
+
+.character-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    width: 45%;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: transform 0.2s;
+}
+
+.character-card h2 {
+    margin-top: 0;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    color: var(--gold);
+    margin-bottom: 15px;
+}
+
+#enemy-sprite, #player-sprite {
+    font-size: 80px;
+    margin: 10px 0;
+    text-shadow: 0 5px 10px rgba(0,0,0,0.5);
+}
+
+/* Barres de vie améliorées */
+.bars { width: 100%; margin-top: 10px; font-weight: bold; font-size: 0.9em;}
+.bar-container {
+    background-color: #000;
+    height: 16px;
+    width: 100%;
+    margin: 5px 0 2px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #333;
+    position: relative;
+}
+
+.bar { height: 100%; width: 100%; transition: width 0.4s ease-out; }
+.hp { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+.mp { background: linear-gradient(90deg, #2980b9, #3498db); }
+
+/* Zone de Log */
+#combat-log {
+    height: 120px;
+    background: #0f0f1a;
+    border-radius: 10px;
+    padding: 15px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    border-left: 4px solid var(--accent);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+#combat-log p { margin: 5px 0; border-bottom: 1px solid #222; padding-bottom: 2px;}
+
+/* Boutons d'actions */
+.controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.controls button {
+    background: linear-gradient(180deg, #3a3a5e, #2b2b4e);
+    border: 1px solid #555;
+    padding: 15px;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.controls button:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(233, 69, 96, 0.4);
+    border-color: var(--accent);
+}

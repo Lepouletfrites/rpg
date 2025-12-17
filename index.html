@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>RPG JS - Mode Avancé</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="game-info">
+        Vague : <span id="wave-count">1</span> | 
+        Niveau : <span id="level-count">1</span> | 
+        XP : <span id="xp-count">0</span> / <span id="xp-max">100</span>
+    </div>
+
+    <div class="game-container">
+        
+        <div class="battle-field">
+            
+            <div class="character-card" id="enemy-area">
+                <h2 id="enemy-name">Monstre</h2>
+                <div id="enemy-sprite">👹</div>
+                <div class="bars">
+                    <div class="bar-container">
+                        <div id="enemy-hp-bar" class="bar hp"></div>
+                    </div>
+                    <span id="enemy-hp-text">100/100 PV</span>
+                </div>
+            </div>
+
+            <div class="character-card" id="player-area">
+                <h2 id="player-name">Héros</h2>
+                <div id="player-sprite">🛡️</div>
+                <div class="bars">
+                    <div class="bar-container">
+                        <div id="player-hp-bar" class="bar hp"></div>
+                    </div>
+                    <span id="player-hp-text">100/100 PV</span>
+                    
+                    <div class="bar-container" style="margin-top: 8px;">
+                        <div id="player-mp-bar" class="bar mp"></div>
+                    </div>
+                    <span id="player-mp-text">50/50 MP</span>
+                </div>
+
+                <div class="controls" id="actions-container">
+                    </div>
+            </div>
+
+        </div>
+
+        <div id="combat-log">
+            <p>Le combat commence ! Préparez-vous...</p>
+        </div>
+
+    </div>
+
+    <script src="classes.js"></script> 
+    <script src="data.js"></script>    
+    <script src="game.js"></script>
+</body>
+</html>
