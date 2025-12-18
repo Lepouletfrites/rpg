@@ -9,10 +9,9 @@
 <body>
     
     <div id="game-info">
-        Vague : <span id="wave-count">1</span> | 
-        Niveau : <span id="level-count">1</span> | 
-        XP : <span id="xp-count">0</span> / <span id="xp-max">100</span>
+        💀 Vague : <span id="wave-count">1</span>
     </div>
+
 
     <div class="game-container">
         
@@ -55,9 +54,71 @@
         </div>
 
     </div>
+    <div id="skill-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔮 Grimoire</h3>
+                <button id="close-modal-btn" class="close-btn">X</button>
+            </div>
+            <div id="modal-skills-container" class="skill-grid">
+                </div>
+        </div>
+    </div>
+    
+    <div id="detail-modal" class="modal hidden" style="z-index: 1100;">
+        <div class="modal-content" style="border-color: #3498db;">
+            <div class="modal-header">
+                <h3 id="detail-title">Nom du Sort</h3>
+                <button onclick="document.getElementById('detail-modal').classList.add('hidden')" class="close-btn">X</button>
+            </div>
+            <div id="detail-body" style="text-align: left; line-height: 1.6;">
+                </div>
+        </div>
+    </div>
+    
+    <div id="stats-modal" class="modal hidden" style="z-index: 1200;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Fiche Personnage</h3>
+                <button onclick="document.getElementById('stats-modal').classList.add('hidden')" class="close-btn">X</button>
+            </div>
+            <div id="stats-body">
+                </div>
+        </div>
+    </div>
+    
+    <div id="analysis-modal" class="modal hidden" style="z-index: 1300;">
+        <div class="modal-content" style="border-color: #e74c3c;">
+            <div class="modal-header">
+                <h3>👁️ Analyse de la cible</h3>
+                <button id="close-analysis-btn" class="close-btn">X</button>
+            </div>
+            <div id="analysis-body" style="text-align: left;">
+                </div>
+            <div style="margin-top:15px; font-size:0.8rem; color:#888; font-style:italic;">
+                Fermer cette fenêtre terminera votre tour.
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="reward-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>🎁 Victoire ! Choisissez une récompense</h3>
+            </div>
+            
+            <div id="reward-container" class="reward-grid">
+                </div>
+        </div>
+    </div>
+
 
     <script src="classes.js"></script> 
-    <script src="data.js"></script>    
+    <script src="skills.js"></script> 
+    <script src="loot.js"></script>
+    <script src="entities.js"></script> 
     <script src="game.js"></script>
+
 </body>
 </html>

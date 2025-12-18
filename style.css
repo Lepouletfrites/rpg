@@ -1,4 +1,4 @@
-/* style.css - Refonte Complète */
+/* style.css - Layout Vertical Gauche + Log Droite */
 :root {
     --bg-color: #1a1a2e;
     --card-bg: #16213e;
@@ -12,18 +12,19 @@
 body {
     background-color: var(--bg-color);
     color: var(--text);
-    font-family: 'Roboto', sans-serif; /* Police texte général */
+    font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
-/* Infos du haut (Vague, XP) */
 #game-info {
-    font-family: 'Press Start 2P', cursive; /* Police Rétro */
+    font-family: 'Press Start 2P', cursive;
     background: rgba(0, 0, 0, 0.5);
     padding: 15px 30px;
     border-radius: 15px;
@@ -34,93 +35,104 @@ body {
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
 }
 
+/* --- CONTENEUR PRINCIPAL --- */
 .game-container {
-    width: 90%;
-    max-width: 800px;
+    width: 100%;
+    max-width: 1000px;
     background-color: var(--card-bg);
     border-radius: 20px;
-    padding: 30px;
+    padding: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    
+    /* C'est ici que la magie opère : Flex Row */
+    display: flex;       
+    flex-direction: row;  /* Gauche vs Droite */
+    align-items: stretch; /* Le log s'étire pour faire la même hauteur */
+    gap: 20px;           
 }
 
-/* Zone de combat (Héros vs Monstre) */
+/* --- COLONNE DE GAUCHE (COMBAT) --- */
 .battle-field {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* Pour mobile */
+    flex-direction: column; /* IMPORTANT : Monstre au dessus, Héros en dessous */
+    flex: 2; /* Prend environ 66% de la largeur totale */
+    gap: 20px; /* Espace entre le Monstre et le Héros */
 }
 
+/* Les cartes (Monstre et Héros) prennent toute la largeur de la colonne gauche */
 .character-card {
     background: rgba(255, 255, 255, 0.05);
-    padding: 20px;
+    padding: 15px;
     border-radius: 15px;
-    width: 45%;
+    width: 100%; /* Remplit la colonne de gauche */
     text-align: center;
     border: 1px solid rgba(255,255,255,0.1);
-    transition: transform 0.2s;
+    box-sizing: border-box;
 }
 
 .character-card h2 {
     margin-top: 0;
     font-family: 'Press Start 2P', cursive;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--gold);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 #enemy-sprite, #player-sprite {
-    font-size: 80px;
-    margin: 10px 0;
+    font-size: 50px;
+    margin: 5px 0;
     text-shadow: 0 5px 10px rgba(0,0,0,0.5);
 }
 
-/* Barres de vie améliorées */
-.bars { width: 100%; margin-top: 10px; font-weight: bold; font-size: 0.9em;}
-.bar-container {
-    background-color: #000;
-    height: 16px;
-    width: 100%;
-    margin: 5px 0 2px 0;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #333;
-    position: relative;
+/* --- COLONNE DE DROITE (LOG) --- */
+#combat-log {
+    flex: 1; 
+    background: #0f0f1a;
+    border-radius: 10px;
+    padding: 15px;
+    
+    /* --- CORRECTION ICI --- */
+    height: 450px;       /* On fixe une hauteur de base */
+    max-height: 450px;   /* On interdit de dépasser cette taille */
+    overflow-y: auto;    /* La barre de scroll apparaît si le texte est trop long */
+    /* -------------------- */
+
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    border-left: 4px solid var(--accent);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
 }
 
+#combat-log p { margin: 5px 0; border-bottom: 1px solid #222; padding-bottom: 4px; line-height: 1.3;}
+
+/* --- BARRES --- */
+.bars { width: 100%; margin-top: 5px; font-weight: bold; font-size: 0.75em;}
+.bar-container {
+    background-color: #000; height: 12px; width: 100%; margin: 5px 0 2px 0;
+    border-radius: 6px; overflow: hidden; border: 1px solid #333; position: relative;
+}
 .bar { height: 100%; width: 100%; transition: width 0.4s ease-out; }
 .hp { background: linear-gradient(90deg, #c0392b, #e74c3c); }
 .mp { background: linear-gradient(90deg, #2980b9, #3498db); }
 
-/* Zone de Log */
-#combat-log {
-    height: 120px;
-    background: #0f0f1a;
-    border-radius: 10px;
-    padding: 15px;
-    overflow-y: auto;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    border-left: 4px solid var(--accent);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-}
-#combat-log p { margin: 5px 0; border-bottom: 1px solid #222; padding-bottom: 2px;}
-
-/* Boutons d'actions */
+/* --- BOUTONS --- */
 .controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
+    grid-template-columns: 1fr 1fr; 
+    gap: 8px;
     margin-top: 10px;
 }
 
-.controls button {
+.skill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.controls button, .skill-grid button {
     background: linear-gradient(180deg, #3a3a5e, #2b2b4e);
     border: 1px solid #555;
-    padding: 15px;
+    padding: 10px;
     color: white;
     font-family: 'Roboto', sans-serif;
     font-weight: bold;
@@ -128,12 +140,87 @@ body {
     border-radius: 8px;
     transition: all 0.2s;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+    width: 100%;
+    min-height: 45px;
+    
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
-.controls button:hover {
+.controls button:hover, .skill-grid button:hover {
     background: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(233, 69, 96, 0.4);
     border-color: var(--accent);
+}
+
+.controls button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* --- MODALES --- */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000; opacity: 1; transition: opacity 0.3s;
+}
+.modal.hidden { display: none; opacity: 0; pointer-events: none; }
+
+.modal-content {
+    background: var(--card-bg); border: 2px solid var(--gold); padding: 20px;
+    border-radius: 15px; width: 90%; max-width: 450px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); text-align: center;
+}
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+}
+.modal-header h3 { margin: 0; color: var(--gold); font-family: 'Press Start 2P', cursive; font-size: 0.8rem; }
+
+.close-btn {
+    background: transparent; border: 1px solid var(--accent); color: var(--accent);
+    font-weight: bold; cursor: pointer; padding: 5px 10px; border-radius: 5px;
+}
+
+/* Détails */
+.detail-row { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
+.detail-label { color: #aaa; }
+.detail-value { color: #fff; font-weight: bold; }
+.detail-desc { margin-top: 15px; color: #ecf0f1; font-style: italic; }
+
+#player-area { cursor: help; }
+#player-area:active { transform: scale(0.99); }
+
+.stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 1rem; }
+.stat-name { color: #bdc3c7; }
+.stat-val { font-weight: bold; color: var(--gold); }
+
+/* --- RÉCOMPENSES --- */
+.reward-grid { display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+.reward-card {
+    background: linear-gradient(180deg, #2c3e50, #000000); border: 2px solid #7f8c8d;
+    border-radius: 10px; padding: 20px; width: 30%; min-width: 140px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.reward-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+.reward-icon { font-size: 3rem; margin-bottom: 10px; }
+.reward-title { font-weight: bold; color: var(--gold); margin-bottom: 5px; font-size: 0.9rem; }
+.reward-desc { font-size: 0.75rem; color: #bdc3c7; }
+.rarity-tag { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+
+.common { border-color: #bdc3c7; } .common .rarity-tag, .common .reward-icon { color: #bdc3c7; }
+.rare { border-color: #3498db; background: linear-gradient(180deg, #1a253a, #16213e); } .rare .rarity-tag, .rare .reward-icon { color: #3498db; }
+.epic { border-color: #9b59b6; background: linear-gradient(180deg, #2c1a3a, #16213e); } .epic .rarity-tag, .epic .reward-icon { color: #9b59b6; }
+.legendary { border-color: #f1c40f; background: linear-gradient(180deg, #3a301a, #16213e); animation: pulse-legendary 2s infinite; }
+.legendary .rarity-tag, .legendary .reward-icon { color: #f1c40f; }
+
+@keyframes pulse-legendary { 0% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); } 50% { box-shadow: 0 0 40px rgba(241, 196, 15, 1); } 100% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); } }
+
+/* --- MOBILE --- */
+@media (max-width: 800px) {
+    .game-container { flex-direction: column; }
+    .battle-field { width: 100%; flex: none; }
+    #combat-log { width: 100%; height: 200px; flex: none; }
 }
