@@ -24,7 +24,7 @@ const SKILL_DATABASE = {
 
     // --- MAGIE (FEU) ---
     "boule_feu": new Skill("🔥 Feu", 8, 2, "feu", "Magie de Feu", (user, target) => {
-        let rawDmg = Math.floor(user.int * 1.5); 
+        let rawDmg = Math.floor(user.int * 3.5); 
         let calc = Math.max(1, rawDmg - target.magDef);
         return target.receiveDamage(calc, "feu");
     }),
@@ -53,5 +53,36 @@ const SKILL_DATABASE = {
     
     "cri": new Skill("Cri", 0, 3, "physique", "Boost Force", (user, target) => {
         user.str += 2; return "BUFF";
+    }),
+    
+    "bouclier_lave": new Skill("🛡️ Bouclier Lave", 15, 4, "feu", "+50% Res. Feu", (user, target) => {
+        // On modifie la résistance COURANTE (celle qui sera reset fin de vague)
+        user.resistances["feu"] += 50;
+        // On retourne un message personnalisé pour le log
+        return { 
+            customMsg: " se recouvre de lave durcie (+50% Résistance Feu) !" 
+        };
+    }),
+    
+    // --- skills.js ---
+
+// Ajoute ceci dans SKILL_DATABASE :
+
+    "flechette_poison": new Skill("☠️ Poison", 10, 3, "poison", "Dégâts + Poison (3 tours)", (user, target) => {
+        // 1. Dégâts initiaux (faibles)
+        let rawDmg = Math.floor(user.int * 1.5);
+        let dmgResult = target.receiveDamage(rawDmg, "physique");
+
+        // 2. Application de l'effet
+        // (Nom, Dégâts par tour, Durée en tours, Type)
+        let dotDamage = Math.floor(user.int * 0.8); // Dégâts du poison basés sur l'Intell
+        target.applyEffect("Poison", dotDamage, 3, "tenebres");
+
+        // On retourne un objet spécial pour que le log affiche le texte perso
+        return { 
+            dmg: dmgResult.dmg, 
+            customMsg: ` et infecte la cible avec du Poison !` 
+        };
     })
+
 };

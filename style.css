@@ -23,16 +23,43 @@ body {
     box-sizing: border-box;
 }
 
+/* Mise à jour du bandeau d'info pour inclure le bouton */
 #game-info {
     font-family: 'Press Start 2P', cursive;
     background: rgba(0, 0, 0, 0.5);
-    padding: 15px 30px;
+    padding: 10px 20px; /* Un peu moins de padding */
     border-radius: 15px;
     border: 2px solid var(--gold);
     color: var(--gold);
     margin-bottom: 20px;
     font-size: 0.8rem;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    
+    /* Flexbox pour aligner le texte et le bouton */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    min-width: 300px;
+}
+
+/* Style du bouton Reset */
+#restart-btn {
+    background: #c0392b; /* Rouge */
+    border: 1px solid #e74c3c;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+#restart-btn:hover {
+    background: #e74c3c;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
 }
 
 /* --- CONTENEUR PRINCIPAL --- */
@@ -218,9 +245,85 @@ body {
 
 @keyframes pulse-legendary { 0% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); } 50% { box-shadow: 0 0 40px rgba(241, 196, 15, 1); } 100% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); } }
 
-/* --- MOBILE --- */
-@media (max-width: 800px) {
-    .game-container { flex-direction: column; }
-    .battle-field { width: 100%; flex: none; }
-    #combat-log { width: 100%; height: 200px; flex: none; }
+/* --- MOBILE & TABLETTE (Mode Portrait) --- */
+/* On cible les écrans jusqu'à 950px de large */
+@media (max-width: 950px) {
+
+    /* 1. On change la direction du conteneur principal */
+    .game-container {
+        flex-direction: column; /* Les éléments s'empilent verticalement */
+        align-items: center;    /* On centre tout */
+        padding: 10px;          /* Un peu moins de marge interne */
+        gap: 15px;              /* Espace réduit entre le combat et le log */
+    }
+
+    /* 2. La zone de combat prend toute la largeur */
+    .battle-field {
+        width: 100%;
+        flex: none; /* Annule le ratio flexible du mode paysage */
+    }
+
+    /* 3. Le journal de combat passe en dessous */
+    #combat-log {
+        width: 100%;
+        flex: none;
+        
+        /* On réduit la hauteur pour que le joueur n'ait pas à scroller indéfiniment */
+        height: 200px;       
+        max-height: 250px;
+        
+        margin-top: 5px;
+    }
+
+    /* 4. Petits ajustements pour gagner de la place sur les petits écrans */
+    #game-info {
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        width: 90%;          /* S'adapte à la largeur */
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .character-card {
+        padding: 10px; /* Cartes un peu plus compactes */
+    }
+}
+
+.class-card-btn {
+    background: linear-gradient(180deg, #2c3e50, #1a1a2e);
+    border: 2px solid #7f8c8d;
+    border-radius: 10px;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.class-card-btn:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.class-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.class-name {
+    font-family: 'Press Start 2P', cursive;
+    color: var(--gold);
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+.class-desc {
+    font-size: 0.7rem;
+    color: #bdc3c7;
+    line-height: 1.4;
 }

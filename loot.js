@@ -10,6 +10,8 @@ const BASE_RARITY_CHANCE = {
 };
 
 // Liste des Bonus de Stats possibles par rareté
+// --- loot.js ---
+
 const STAT_POOL = {
     "common": [
         { key: "str", val: 1, label: "Force Mineure" },
@@ -26,24 +28,30 @@ const STAT_POOL = {
         { key: "str", val: 5, label: "Force de Titan" },
         { key: "int", val: 5, label: "Génie Magique" },
         { key: "maxMp", val: 20, label: "Source de Mana" },
-        { key: "magDef", val: 4, label: "Aura Protectrice" }
+        { key: "magDef", val: 4, label: "Aura Protectrice" },
+        
+        // --- NOUVEAU : Résistances Épiques (+10%) ---
+        { key: "res_feu", val: 10, label: "Ignifugé" },
+        { key: "res_physique", val: 5, label: "Corps d'Acier" }
     ],
     "legendary": [
         { key: "maxHp", val: 50, label: "Cœur de Dragon" },
         { key: "str", val: 8, label: "Puissance Divine" },
-        { key: "int", val: 8, label: "Omniscience" },
-        { key: "def", val: 5, label: "Invulnérabilité" }
+        { key: "def", val: 5, label: "Invulnérabilité" },
+        
+        // --- NOUVEAU : Résistances Légendaires (+20%) ---
+        { key: "res_tenebres", val: 20, label: "Lumière Intérieure" },
+        { key: "res_physique", val: 10, label: "Peau de Diamant" }
     ]
 };
+
 
 // --- DÉPLACÉ DEPUIS SKILLS.JS ---
 // Liste des Sorts distribuables en récompense
 const SKILL_POOL = [
     { key: "soin_leger", rarity: "common" },
-    { key: "posture_defensive", rarity: "common" },
-    { key: "boule_feu", rarity: "rare" },
-    { key: "frappe_lourde", rarity: "rare" },
-    { key: "souffle_feu", rarity: "epic" },
-    { key: "cri", rarity: "epic" }
+    { key: "boule_feu", rarity: "rare", classes: ["mage"] },
+    { key: "frappe_lourde", rarity: "rare", classes: ["guerrier"] },
+    { key: "cri", rarity: "epic",classes: ["guerrier"] }
 ];
 

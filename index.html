@@ -10,6 +10,7 @@
     
     <div id="game-info">
         💀 Vague : <span id="wave-count">1</span>
+        <button id="restart-btn">🗑️ Reset</button>
     </div>
 
 
@@ -113,6 +114,15 @@
         </div>
     </div>
 
+    <div id="class-selection-modal" class="modal hidden" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>⚔️ Choisissez votre Héros ⚔️</h3>
+            </div>
+            <div id="class-list-container" class="skill-grid" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                </div>
+        </div>
+    </div>
 
     <script src="classes.js"></script> 
     <script src="skills.js"></script> 
