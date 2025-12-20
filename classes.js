@@ -1,10 +1,7 @@
-/* classes.js - Version Roguelite (Sans XP) */
-
-// --- classes.js ---
+/* classes.js - Version Complète (Buffs + DoTs + Résistances) */
 
 class Character {
     constructor(name, maxHp, maxMp, str, def, int, magDef, resistances = {}) {
-        // ... (tes propriétés classiques: name, hp, mp, str...) ...
         this.name = name;
         this.maxHp = maxHp; this.currentHp = maxHp;
         this.maxMp = maxMp; this.currentMp = maxMp;
@@ -14,46 +11,80 @@ class Character {
         this.baseInt = int;     this.int = int;
         this.baseMagDef = magDef; this.magDef = magDef;
 
-        // --- NOUVEAU : GESTION DES RÉSISTANCES ---
-        // 1. Définition des valeurs par défaut
+        // --- GESTION DES RÉSISTANCES ---
         const defaultRes = { physique: 0, feu: 0, eau: 0, electrique: 0, terre: 0, tenebres: 0, lumiere: 0 };
-        
-        // 2. On stocke la BASE (Permanente)
         this.baseResistances = { ...defaultRes, ...resistances };
-        
-        // 3. On stocke la COURANTE (Copie modifiable)
         this.resistances = { ...this.baseResistances };
-        // -----------------------------------------
 
-        this.statusEffects = [];
+        // --- LISTES D'EFFETS ---
+        this.statusEffects = []; // Pour les DoT (Poison, Saignement)
+        this.activeBuffs = [];   // Pour les Stats temporaires (Force +5, etc.)
+
         this.skills = [];
         this.cooldowns = {}; 
         this.isDefending = false;
         this.classId = null;
     }
 
-    // --- 1. AJOUTER UN EFFET ---
+    // --- 1. GESTION DES BUFFS TEMPORAIRES (Force, Def, etc.) ---
+    applyBuff(stat, value, duration, subKey = null) {
+        // Appliquer l'effet immédiatement
+        if (subKey) {
+            this[stat][subKey] += value; // Ex: resistances.feu
+        } else {
+            this[stat] += value;         // Ex: str
+        }
+
+        // Enregistrer pour plus tard
+        this.activeBuffs.push({ 
+            stat: stat, 
+            subKey: subKey, 
+            val: value, 
+            turns: duration,
+            name: subKey ? `${subKey.toUpperCase()}` : stat.toUpperCase()
+        });
+    }
+
+    // --- 2. GESTION DES DoT (Poison, Saignement) ---
+    // C'est cette fonction qui manquait !
     applyEffect(name, damage, duration, type) {
-        // On vérifie si l'effet existe déjà pour le rafraîchir (optionnel)
         const existing = this.statusEffects.find(e => e.name === name);
         if (existing) {
-            existing.duration = duration; // On remet le compteur à zéro
+            existing.duration = duration;
             existing.damage = damage;
         } else {
             this.statusEffects.push({ name, damage, duration, type });
         }
     }
 
-    // --- 2. SUBIR LES EFFETS (Début du tour) ---
+    // --- 3. DÉBUT DU TOUR : Gérer Buffs ET DoTs ---
     triggerStatusEffects() {
-        let logs = []; // On va stocker ce qui s'est passé pour l'afficher
+        let logs = [];
 
-        // On parcourt les effets à l'envers pour pouvoir supprimer sans bug
+        // A. Gérer l'expiration des BUFFS
+        for (let i = this.activeBuffs.length - 1; i >= 0; i--) {
+            let buff = this.activeBuffs[i];
+            buff.turns--;
+
+            if (buff.turns <= 0) {
+                // On retire le bonus/malus
+                if (buff.subKey) {
+                    this[buff.stat][buff.subKey] -= buff.val;
+                } else {
+                    this[buff.stat] -= buff.val;
+                }
+                
+                let sign = buff.val > 0 ? "bonus" : "malus";
+                logs.push({ expired: true, effectName: `L'effet ${sign} de ${buff.name}` });
+                this.activeBuffs.splice(i, 1);
+            }
+        }
+
+        // B. Gérer les Dégâts sur la durée (DoT)
         for (let i = this.statusEffects.length - 1; i >= 0; i--) {
             const effect = this.statusEffects[i];
-
-            // Appliquer les dégâts
-            // On utilise receiveDamage pour prendre en compte les résistances (ex: résistance poison)
+            
+            // On utilise receiveDamage pour prendre en compte les résistances
             const result = this.receiveDamage(effect.damage, effect.type);
 
             logs.push({
@@ -62,22 +93,22 @@ class Character {
                 type: effect.type
             });
 
-            // Réduire la durée
             effect.duration--;
-
-            // Si fini, on supprime
             if (effect.duration <= 0) {
                 this.statusEffects.splice(i, 1);
                 logs.push({ expired: true, effectName: effect.name });
             }
         }
-        return logs; // On renvoie la liste des événements au jeu
+        
+        const mpRegen = Math.floor(this.maxMp * 0.05); 
+        if (this.currentMp < this.maxMp) {
+            this.currentMp = Math.min(this.maxMp, this.currentMp + mpRegen);
+        }
+
+        return logs;
     }
 
-    // ... (Garde tes méthodes existantes : createFromId, receiveDamage, resetBuffs, etc.) ...
-
-
-        // --- FACTORY (Mise à jour équilibrage) ---
+    // --- FACTORY (Création des persos) ---
     static createFromId(id, type, wave = 1) {
         if (typeof HEROES_DATA === 'undefined' || typeof MONSTERS_DATA === 'undefined') return null;
 
@@ -87,50 +118,30 @@ class Character {
 
         if (!data) return null;
 
-        // --- FORMULES D'ÉQUILIBRAGE ---
-        
         let hp, str, def, int, magDef, xp;
 
         if (type === "hero") {
-            // Le héros n'est pas affecté par la vague à la création (c'est ses objets qui le boostent)
-            hp = data.maxHp;
-            str = data.str;
-            def = data.def;
-            int = data.int || 1;
-            magDef = data.magDef || 0;
+            hp = data.maxHp; str = data.str; def = data.def; int = data.int || 1; magDef = data.magDef || 0;
         } else {
-            // --- MONSTRES : Évolution différenciée ---
-            
-            // 1. PV : Augmentation de 10% par vague (Le monstre devient plus résistant)
+            // Équilibrage Monstres
             const hpMult = 1 + (wave - 1) * 0.10; 
             hp = Math.floor(data.maxHp * hpMult);
 
-            // 2. FORCE/INT : Augmentation lente de 3% par vague (Pour ne pas one-shot le joueur)
             const strMult = 1 + (wave - 1) * 0.03;
             str = Math.floor(data.str * strMult);
             int = Math.floor((data.int || 1) * strMult);
 
-            // 3. DÉFENSE : Augmentation TRES lente (Plate)
-            // On ajoute juste +1 point de défense toutes les 5 vagues.
-            // Sinon, à la vague 20, le monstre serait invulnérable.
             const bonusDef = Math.floor((wave - 1) / 5); 
             def = data.def + bonusDef;
             magDef = (data.magDef || 0) + bonusDef;
 
-            // 4. XP : Augmente de 10% par vague (pour le score ou futur leveling)
             xp = Math.floor(data.xpReward * (1 + (wave * 0.1)));
         }
 
-        // Création de l'instance
         const newChar = new Character(data.name, hp, data.maxMp, str, def, int, magDef, data.resistances);
 
-        if (type === "hero") {
-            newChar.classId = id; 
-        }
-    
-        if (data.skills) {
-            data.skills.forEach(s => newChar.learnSkill(s));
-        }
+        if (type === "hero") newChar.classId = id; 
+        if (data.skills) data.skills.forEach(s => newChar.learnSkill(s));
 
         if (type === "monster") {
             newChar.xpReward = xp;
@@ -141,61 +152,56 @@ class Character {
         return newChar;
     }
 
+// --- Dans classes.js, remplace la méthode receiveDamage par celle-ci ---
 
-    // --- NOUVELLE FONCTION DE CALCUL DE DÉGÂTS ---
-    // Cette fonction remplace "currentHp -= damage"
-    receiveDamage(amount, type) {
-        // 1. Récupérer la résistance (0 par défaut si type inconnu)
+    receiveDamage(rawAmount, type) {
+        // 1. Déterminer quel type de défense utiliser
+        // Si c'est physique => Def. Si c'est magique (feu, eau, etc.) => MagDef
+        const isPhysical = (type === "physique");
+        const armor = isPhysical ? this.def : this.magDef;
+
+        // 2. Calcul de la Réduction par l'Armure (Formule MOBA/MMO)
+        // Facteur de réduction = K / (K + Armure). Ici K = 50.
+        // Exemple : 50 Def => 50 / (50 + 50) = 0.5 (50% dégâts reçus)
+        const ARMOR_CONSTANT = 50;
+        const mitigationFactor = ARMOR_CONSTANT / (ARMOR_CONSTANT + armor);
+
+        let damageAfterArmor = Math.floor(rawAmount * mitigationFactor);
+
+        // 3. Gestion des Résistances Élémentaires (Pourcentage)
         const resPercent = this.resistances[type] || 0;
-
-        // 2. Calcul du multiplicateur
-        // Ex: 20% res -> facteur 0.8 (1 - 0.20)
-        // Ex: -50% res -> facteur 1.5 (1 - (-0.50))
-        const factor = 1 - (resPercent / 100);
-
-        // 3. Calcul final
-        let finalDamage = Math.floor(amount * factor);
-        if (finalDamage < 0) finalDamage = 0; // Pas de soin par dégâts négatifs
-
-        // 4. Appliquer les dégâts
+        const elementFactor = 1 - (resPercent / 100);
+        
+        let finalDamage = Math.floor(damageAfterArmor * elementFactor);
+        
+        // Sécurité : On s'assure qu'il y a toujours au moins 1 dégât (chip damage)
+        // Sauf si l'immunité élémentaire est totale (100% res)
+        if (finalDamage < 1 && resPercent < 100) finalDamage = 1; 
+        
         this.currentHp -= finalDamage;
         if (this.currentHp < 0) this.currentHp = 0;
 
-        // 5. Retourner un objet complet pour les logs (Dégâts + Info efficacité)
         return {
             dmg: finalDamage,
-            isWeak: resPercent < 0,      // C'était une faiblesse
-            isResist: resPercent > 0,    // C'était une résistance
+            isWeak: resPercent < 0,
+            isResist: resPercent > 0 || mitigationFactor < 0.5, // On considère "résistant" si l'armure réduit de >50%
             type: type
         };
     }
 
-    // --- GESTION DES COMPETENCES ---
-
-        // --- GESTION DES COMPETENCES (Corrigé) ---
+    // --- UTILS ---
     learnSkill(skillKey) {
-        // 1. Sécurité d'abord : est-ce que la base de données et le sort existent ?
-        if (typeof SKILL_DATABASE === 'undefined' || !SKILL_DATABASE[skillKey]) {
-            console.warn(`Le sort "${skillKey}" n'existe pas dans la base !`);
-            return;
-        }
-
+        if (typeof SKILL_DATABASE === 'undefined' || !SKILL_DATABASE[skillKey]) return;
         const newSkill = SKILL_DATABASE[skillKey];
-
-        // 2. Ensuite on vérifie si on l'a déjà
         if (this.skills.find(s => s.name === newSkill.name)) return;
-
-        // 3. Si tout est bon, on l'ajoute
         this.skills.push(newSkill);
     }
-
 
     hasSkill(skillKey) {
         const skillName = SKILL_DATABASE[skillKey].name;
         return this.skills.some(s => s.name === skillName);
     }
 
-    // --- BOOST DE STATS (Système de Récompense) ---
     upgradeStat(stat, amount) {
         if (stat === "maxHp") { this.maxHp += amount; this.currentHp += amount; }
         else if (stat === "maxMp") { this.maxMp += amount; this.currentMp += amount; }
@@ -203,13 +209,8 @@ class Character {
         else if (stat === "int") { this.baseInt += amount; this.int += amount; }
         else if (stat === "def") { this.baseDef += amount; this.def += amount; }
         else if (stat === "magDef") { this.baseMagDef += amount; this.magDef += amount; }
-        
-        // --- NOUVEAU : GESTION DES RECOMPENSES DE RESISTANCE ---
-        // Si la clé commence par "res_", c'est une résistance (ex: "res_feu")
         else if (stat.startsWith("res_")) {
-            const type = stat.replace("res_", ""); // On enlève le préfixe pour avoir "feu"
-            
-            // On augmente la base et la courante
+            const type = stat.replace("res_", "");
             if (this.baseResistances[type] !== undefined) {
                 this.baseResistances[type] += amount;
                 this.resistances[type] += amount;
@@ -218,27 +219,24 @@ class Character {
     }
 
     resetBuffs() {
+        // On remet les stats de base
         this.str = this.baseStr;
         this.int = this.baseInt;
         this.def = this.baseDef;
         this.magDef = this.baseMagDef;
         
-        // --- NOUVEAU : RESET DES RESISTANCES ---
-        // On recrée une copie propre depuis la base
+        // On remet les résistances de base
         this.resistances = { ...this.baseResistances };
-        // ---------------------------------------
         
         this.isDefending = false;
-        this.statusEffects = [];
+        this.statusEffects = []; // On purge les DoT
+        this.activeBuffs = [];   // On purge les Buffs
         this.cooldowns = {}; 
     }
 
-    // --- COMBAT & CD ---
     updateCooldowns() {
         for (let skillName in this.cooldowns) {
-            if (this.cooldowns[skillName] > 0) {
-                this.cooldowns[skillName]--;
-            }
+            if (this.cooldowns[skillName] > 0) this.cooldowns[skillName]--;
         }
     }
 
@@ -248,9 +246,7 @@ class Character {
     }
 
     triggerCooldown(skill) {
-        if (skill.maxCooldown > 0) {
-            this.cooldowns[skill.name] = skill.maxCooldown + 1;
-        }
+        if (skill.maxCooldown > 0) this.cooldowns[skill.name] = skill.maxCooldown + 1;
     }
 
     useMana(amount) {
@@ -263,12 +259,11 @@ class Character {
 }
 
 class Skill {
-    // Ajout du paramètre TYPE
     constructor(name, cost, cooldown, type, description, effectFunction) {
         this.name = name;
         this.cost = cost; 
         this.maxCooldown = cooldown;
-        this.type = type; // "feu", "physique", etc.
+        this.type = type; 
         this.description = description;
         this.effect = effectFunction;
     }

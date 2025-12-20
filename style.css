@@ -246,34 +246,61 @@ body {
 @keyframes pulse-legendary { 0% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); } 50% { box-shadow: 0 0 40px rgba(241, 196, 15, 1); } 100% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); } }
 
 /* --- MOBILE & TABLETTE (Mode Portrait) --- */
-/* On cible les écrans jusqu'à 950px de large */
 @media (max-width: 950px) {
 
-    /* 1. On change la direction du conteneur principal */
+    body {
+        /* On enlève le centrage vertical pour laisser scroller naturellement sur mobile */
+        min-height: auto; 
+        display: block; 
+    }
+
+    /* 1. On empile les éléments verticalement */
     .game-container {
-        flex-direction: column; /* Les éléments s'empilent verticalement */
-        align-items: center;    /* On centre tout */
-        padding: 10px;          /* Un peu moins de marge interne */
-        gap: 15px;              /* Espace réduit entre le combat et le log */
+        display: flex;
+        flex-direction: column; /* Force la colonne : Combat en haut, Log en bas */
+        align-items: center;
+        padding: 10px;
+        gap: 15px;
+        max-width: 100%; /* S'assure que ça ne dépasse pas */
     }
 
     /* 2. La zone de combat prend toute la largeur */
     .battle-field {
         width: 100%;
-        flex: none; /* Annule le ratio flexible du mode paysage */
+        flex: none; /* Annule le ratio flexible du mode PC */
+        order: 1;   /* S'assure que le combat est en PREMIER */
     }
 
     /* 3. Le journal de combat passe en dessous */
     #combat-log {
         width: 100%;
         flex: none;
+        order: 2; /* S'assure que le log est en DEUXIÈME */
         
-        /* On réduit la hauteur pour que le joueur n'ait pas à scroller indéfiniment */
+        /* Hauteur fixe pour éviter que ça prenne tout l'écran sur mobile */
         height: 200px;       
-        max-height: 250px;
+        min-height: 200px;
         
-        margin-top: 5px;
+        margin-top: 10px;
+        box-sizing: border-box; /* Important pour les bordures */
     }
+
+    /* 4. Ajustement des cartes pour l'écran étroit */
+    .character-card {
+        padding: 10px;
+        margin-bottom: 5px;
+    }
+    
+    /* Le bandeau d'info (Vague / Reset) */
+    #game-info {
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+        flex-direction: row; /* Garde le bouton et le texte alignés */
+        font-size: 0.7rem;
+    }
+}
+
 
     /* 4. Petits ajustements pour gagner de la place sur les petits écrans */
     #game-info {
@@ -327,3 +354,44 @@ body {
     color: #bdc3c7;
     line-height: 1.4;
 }
+
+
+/* --- style.css --- */
+
+/* Style du bouton Reroll */
+.reroll-btn {
+    background: linear-gradient(180deg, #d35400, #e67e22); /* Orange risque */
+    border: 2px solid #f39c12;
+    color: white;
+    font-family: 'Press Start 2P', cursive; /* Style rétro */
+    font-size: 0.7rem;
+    padding: 15px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #a04000; /* Effet 3D */
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
+    line-height: 1.5;
+}
+
+.reroll-btn:hover {
+    background: linear-gradient(180deg, #e67e22, #f39c12);
+    transform: translateY(2px); /* Effet d'appui */
+    box-shadow: 0 2px 0 #a04000;
+}
+
+.reroll-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.reroll-btn small {
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.6rem;
+    margin-top: 5px;
+    opacity: 0.9;
+    text-transform: none;
+}
+
+

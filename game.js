@@ -599,17 +599,28 @@ class Game {
         return "✨";
     }
 
-    showRewards() {
+    // --- Dans game.js ---
+
+    showRewards(count = 3) { // Par défaut, on commence à 3
         const modal = document.getElementById('reward-modal');
         const container = document.getElementById('reward-container');
+        
+        // 1. Nettoyage
         container.innerHTML = ""; 
+        
+        // On supprime l'ancien bouton reroll s'il existe déjà pour éviter les doublons
+        const oldBtn = document.getElementById('reroll-btn-container');
+        if (oldBtn) oldBtn.remove();
 
+        // 2. Génération des récompenses uniques
         const choices = [];
         let attempts = 0;
 
-        while (choices.length < 3 && attempts < 20) {
+        // On génère autant de choix que le paramètre 'count' demande
+        while (choices.length < count && attempts < 50) {
             attempts++;
             const candidate = this.generateRandomReward();
+            // On évite les doublons
             const alreadySelected = choices.some(c => c.type === candidate.type && c.key === candidate.key);
 
             if (!alreadySelected) {
@@ -617,10 +628,14 @@ class Game {
             }
         }
 
+        // 3. Affichage des cartes
         choices.forEach(reward => {
             const card = document.createElement("div");
             card.className = `reward-card ${reward.rarity}`;
-            const rarityLabel = reward.rarity === 'legendary' ? 'LÉGENDAIRE' : reward.rarity.toUpperCase();
+            
+            // Gestion de l'affichage du titre de rareté
+            let rarityLabel = reward.rarity.toUpperCase();
+            if (reward.rarity === 'legendary') rarityLabel = 'LÉGENDAIRE';
 
             card.innerHTML = `
                 <div class="rarity-tag">${rarityLabel}</div>
@@ -633,14 +648,44 @@ class Game {
             card.onclick = () => {
                 this.applyReward(reward);
                 modal.classList.add('hidden');
+                
+                // Nettoyage du bouton reroll à la fermeture
+                const btnContainer = document.getElementById('reroll-btn-container');
+                if (btnContainer) btnContainer.remove();
+                
                 this.nextWave();
             };
 
             container.appendChild(card);
         });
 
+        // 4. Logique du REROLL (Le bouton)
+        // On ne l'affiche que s'il reste plus d'1 choix possible
+        if (count > 1) {
+            const btnContainer = document.createElement("div");
+            btnContainer.id = "reroll-btn-container";
+            btnContainer.style.marginTop = "20px";
+            btnContainer.style.textAlign = "center";
+
+            const rerollBtn = document.createElement("button");
+            rerollBtn.className = "reroll-btn";
+            rerollBtn.innerHTML = `🎲 Relancer les dés <small>(Reste : ${count - 1} choix)</small>`;
+            
+            rerollBtn.onclick = () => {
+                // On relance avec UN choix de moins
+                this.showRewards(count - 1);
+            };
+
+            btnContainer.appendChild(rerollBtn);
+            
+            // On ajoute le bouton APRÈS la grille de récompenses (dans le modal-content)
+            // container.parentNode est .modal-content
+            container.parentNode.appendChild(btnContainer);
+        }
+
         modal.classList.remove('hidden');
     }
+
 
     applyReward(reward) {
         if (reward.type === "skill") {

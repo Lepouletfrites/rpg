@@ -53,13 +53,60 @@ const STAT_POOL = {
 // --- DÉPLACÉ DEPUIS SKILLS.JS ---
 // Liste des Sorts distribuables en récompense
 const SKILL_POOL = [
-    { key: "soin_leger", rarity: "common" },
+    // --- COMMUNS ---
+    { key: "soin_leger", rarity: "common", classes: ["mage", "paladin"] },
+    { key: "meditation", rarity: "common", classes: ["mage", "guerrier", "paladin"] },
+    { key: "dague_poison", rarity: "common", classes: ["voleur"] },
+    { key: "choc_bouclier", rarity: "common", classes: ["paladin", "guerrier"] },
+    { key: "coup_pommeau", rarity: "common", classes: ["guerrier", "paladin"] },
+    { key: "vol_de_mana", rarity: "common", classes: ["voleur", "mage"] },
+    
+    // --- RARES ---
     { key: "boule_feu", rarity: "rare", classes: ["mage"] },
-    { key: "frappe_lourde", rarity: "rare", classes: ["guerrier"] },
-    { key: "torent_feu", rarity: "legendary", classes: ["mage"] },
+    { key: "frappe_lourde", rarity: "rare", classes: ["guerrier", "paladin"] },
     { key: "jet_eau", rarity: "rare", classes: ["mage"] },
-    { key: "orbe_de_poison", rarity: "epic", classes: ["mage"] },
-    { key: "peau_de_pierre", rarity: "rare", classes: ["guerrier"] },
-    { key: "cri", rarity: "epic",classes: ["guerrier"] }
+    { key: "peau_de_pierre", rarity: "rare", classes: ["guerrier", "paladin"] },
+    { key: "saignement", rarity: "rare", classes: ["guerrier", "voleur"] },
+    { key: "eclair", rarity: "rare", classes: ["mage"] },
+    { key: "mur_de_glace", rarity: "rare", classes: ["mage"] },
+    { key: "choc_mental", rarity: "rare", classes: ["mage", "voleur"] },
+    
+    // Nouveaux Rares
+    { key: "attaque_sournoise", rarity: "rare", classes: ["voleur"] },
+    { key: "chatiment", rarity: "rare", classes: ["paladin"] },
+    { key: "stalactite", rarity: "rare", classes: ["mage"] },
+    { key: "tornade", rarity: "rare", classes: ["mage"] },
+    { key: "brise_armure", rarity: "rare", classes: ["guerrier"] },
+    { key: "ombre_liquide", rarity: "rare", classes: ["voleur", "mage"] },
+
+    // --- ÉPIQUES ---
+    { key: "orbe_de_poison", rarity: "epic", classes: ["mage", "voleur"] },
+    { key: "cri", rarity: "epic",classes: ["guerrier"] },
+    { key: "coup_vampire", rarity: "epic", classes: ["guerrier", "mage", "voleur"] },
+    { key: "berserk", rarity: "epic", classes: ["guerrier"] },
+    { key: "seisme", rarity: "epic", classes: ["mage", "paladin"] },
+    
+    // Nouveaux Épiques
+    { key: "pluie_lames", rarity: "epic", classes: ["voleur"] },
+    { key: "camouflage", rarity: "epic", classes: ["voleur"] },
+    { key: "imposition_mains", rarity: "epic", classes: ["paladin"] },
+    { key: "aura_devotion", rarity: "epic", classes: ["paladin"] },
+    { key: "blizzard", rarity: "epic", classes: ["mage"] },
+    { key: "racines", rarity: "epic", classes: ["mage", "paladin"] },
+    { key: "transpercement", rarity: "epic", classes: ["guerrier", "voleur"] },
+    { key: "martyr", rarity: "epic", classes: ["paladin"] },
+
+    // --- LÉGENDAIRES ---
+    { key: "torent_feu", rarity: "legendary", classes: ["mage"] },
+    { key: "execution", rarity: "legendary", classes: ["guerrier"] },
+    { key: "lumiere_sacree", rarity: "legendary", classes: ["mage", "paladin"] },
+    
+    // Nouveaux Légendaires
+    { key: "jugement_dernier", rarity: "legendary", classes: ["paladin"] },
+    { key: "assassinat", rarity: "legendary", classes: ["voleur"] },
+    { key: "avatar_titan", rarity: "legendary", classes: ["guerrier", "paladin"] },
+    { key: "supernova", rarity: "legendary", classes: ["mage"] },
+    { key: "boule_magma", rarity: "legendary", classes: ["mage"] },
+    { key: "paix_interieure", rarity: "legendary", classes: ["paladin", "mage"] }
 ];
 
