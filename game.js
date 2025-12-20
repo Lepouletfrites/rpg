@@ -581,7 +581,7 @@ class Game {
             rarity: rarity,
             icon: this.getIconForStat(stat.key),
             label: stat.label,
-            desc: `+${stat.val} (Permanent)`
+            desc: `${stat.desc}`
         };
     }
 
