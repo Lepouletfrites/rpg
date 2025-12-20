@@ -19,7 +19,7 @@ const SKILL_DATABASE = {
     }),
 
     "frappe_lourde": new Skill("frappe lourde", 10, 2, "physique", "Gros Dégâts Physiques", (user, target) => {
-        let rawDmg = Math.floor(user.str * 2.2) - Math.floor(target.def);
+        let rawDmg = (Math.floor(user.str) - Math.floor(target.def)) * 2.2;
         if (rawDmg < 1) rawDmg = 1;
         return target.receiveDamage(rawDmg, "physique");
     }),
@@ -31,23 +31,20 @@ const SKILL_DATABASE = {
 
     // --- MAGIE (FEU) ---
     "boule_feu": new Skill("🔥 Feu", 8, 2, "feu", "Magie de Feu[coef 1.5]", (user, target) => {
-        let rawDmg = Math.floor(user.int * 1.5); 
-        let calc = Math.max(1, rawDmg - target.magDef);
-        return target.receiveDamage(calc, "feu");
+        let rawDmg = Math.floor((user.int- target.magDef) * 1.5); 
+        return target.receiveDamage(rawDmg, "feu");
     }),
     "torent_feu": new Skill("🔥 vague enflamer", 35, 5, "feu", "Magie de Feu[coef 4.5]", (user, target) => {
-        let rawDmg = Math.floor(user.int * 4.5); 
-        let calc = Math.max(1, rawDmg - target.magDef);
-        return target.receiveDamage(calc, "feu");
+        let rawDmg =  Math.floor((user.int- target.magDef) * 4.5); 
+        return target.receiveDamage(rawDmg, "feu");
     }),
     "jet_eau": new Skill("💧 Eau", 8, 2, "eau", "Magie d'eau", (user, target) => {
-        let rawDmg = Math.floor(user.int * 1.5); 
-        let calc = Math.max(1, rawDmg - target.magDef);
-        return target.receiveDamage(calc, "eau");
+        let rawDmg = Math.floor((user.int- target.magDef) * 1.5); 
+        return target.receiveDamage(rawDmg, "eau");
     }),
 
     "souffle_feu": new Skill("Souffle", 0, 3, "feu", "Feu de zone", (user, target) => {
-        let calc = Math.max(1, (user.int * 1.2) - target.magDef);
+        let calc = Math.floor((user.int- target.magDef) * 2.5)
         return target.receiveDamage(calc, "feu");
     }),
 
@@ -101,7 +98,7 @@ const SKILL_DATABASE = {
     // dot damage
     "orbe_de_poison": new Skill("☠️ Poison", 10, 3, "tenebres", "Dégâts + Poison (3 tours)", (user, target) => {
         // 1. Dégâts initiaux (faibles)
-        let rawDmg = Math.floor(user.int * 1.5) - Math.floor(target.magDef) ;
+        let rawDmg = Math.floor((user.int- target.magDef) * 1.5)
         let dmgResult = target.receiveDamage(rawDmg, "tenebres");
         // 2. Application de l'effet
         // (Nom, Dégâts par tour, Durée en tours, Type)
