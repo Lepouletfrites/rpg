@@ -63,6 +63,14 @@ const SKILL_DATABASE = {
             customMsg: " se recouvre de lave durcie (+50% Résistance Feu) !" 
         };
     }),
+    "hurlement": new Skill("Hurlement", 5, 2, "feu", "- 5 def", (user, target) => {
+        // On modifie la résistance COURANTE (celle qui sera reset fin de vague)
+        target.def -= 5;
+        // On retourne un message personnalisé pour le log
+        return { 
+            customMsg: " ta def diminue" 
+        };
+    }),
     
     // --- skills.js ---
 
