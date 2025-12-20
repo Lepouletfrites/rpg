@@ -6,19 +6,26 @@ const SKILL_DATABASE = {
     // Format : new Skill(Nom, Coût, CD, TYPE, Desc, Effet)
     
     // --- PHYSIQUE ---
-    "coup_basique": new Skill("⚔️ Attaque", 0, 0, "physique", "Attaque normale", (user, target) => {
-        let rawDmg = Math.max(1, user.str - Math.floor(target.def / 2));
+    "coup_basique": new Skill("⚔️ Attaque", 0, 0, "physique", "Attaque normale (meilleur stat)", (user, target) => {
+        let rawDmg = 0;
+        if(user.str > user.int){
+            rawDmg = Math.max(1, Math.floor(user.str) - Math.floor(target.def));            
+        }
+        else{
+            rawDmg = Math.max(1, Math.floor(user.int) - Math.floor(target.magDef));  
+        }
+        
         return target.receiveDamage(rawDmg, "physique");
     }),
 
-    "frappe_lourde": new Skill("frappe lourde", 20, 2, "physique", "Gros Dégâts Physiques", (user, target) => {
-        let rawDmg = Math.floor(user.str * 2.2) - Math.floor(target.def / 2);
+    "frappe_lourde": new Skill("frappe lourde", 10, 2, "physique", "Gros Dégâts Physiques", (user, target) => {
+        let rawDmg = Math.floor(user.str * 2.2) - Math.floor(target.def);
         if (rawDmg < 1) rawDmg = 1;
         return target.receiveDamage(rawDmg, "physique");
     }),
 
     "morsure": new Skill("Morsure", 0, 0, "physique", "Attaque sauvage", (user, target) => {
-        let rawDmg = Math.max(1, user.str - Math.floor(target.def / 2));
+        let rawDmg = Math.max(1, user.str - target.def);
         return target.receiveDamage(rawDmg, "physique");
     }),
 
@@ -94,11 +101,11 @@ const SKILL_DATABASE = {
     // dot damage
     "orbe_de_poison": new Skill("☠️ Poison", 10, 3, "tenebres", "Dégâts + Poison (3 tours)", (user, target) => {
         // 1. Dégâts initiaux (faibles)
-        let rawDmg = Math.floor(user.int * 1.5);
+        let rawDmg = Math.floor(user.int * 1.5) - Math.floor(target.magDef) ;
         let dmgResult = target.receiveDamage(rawDmg, "tenebres");
         // 2. Application de l'effet
         // (Nom, Dégâts par tour, Durée en tours, Type)
-        let dotDamage = Math.floor(user.int * 0.8); // Dégâts du poison basés sur l'Intell
+        let dotDamage = Math.floor(user.int * 0.6); // Dégâts du poison basés sur l'Intell
         target.applyEffect("Poison", dotDamage, 3, "tenebres");
         return { 
             dmg: dmgResult.dmg, 
