@@ -52,6 +52,10 @@ const SKILL_POOL = [
     { key: "soin_leger", rarity: "common" },
     { key: "boule_feu", rarity: "rare", classes: ["mage"] },
     { key: "frappe_lourde", rarity: "rare", classes: ["guerrier"] },
+    { key: "torent_feu", rarity: "legendary", classes: ["mage"] },
+    { key: "jet_eau", rarity: "rare", classes: ["mage"] },
+    { key: "orbe_de_poison", rarity: "epic", classes: ["mage"] },
+    { key: "peau_de_pierre", rarity: "rare", classes: ["guerrier"] },
     { key: "cri", rarity: "epic",classes: ["guerrier"] }
 ];
 
