@@ -1,16 +1,37 @@
 // --- skills.js ---
 // Version mise à jour pour le système de "Mitigation en %"
 
+
 const SKILL_DATABASE = {
     
-    // --- PHYSIQUE ---
+    // --- BASIQUES REVISITÉS ---
     
-    "coup_basique": new Skill("⚔️ Attaque", 0, 0, "physique", "Attaque normale", (user,target) => {
-        // On prend la meilleure stat entre Force et Intell pour l'attaque de base
-        // Note : On envoie la valeur BRUTE. receiveDamage s'occupe de la défense.
+    "coup_basique": new Skill("⚔️ Attaque", 0, 0, "physique", "Dégâts + Regain Mana", (user, target) => {
+        // 1. Calcul des dégâts (Meilleure stat entre Force et Intel)
         let rawPower = (user.str > user.int) ? user.str : user.int;
-        return target.receiveDamage(rawPower, "physique");
+        let result = target.receiveDamage(rawPower, "physique");
+        return result;
     }),
+
+    "posture_defensive": new Skill("🛡️ Défense", 0, 0, "physique", "-50% Dégâts + Soin léger", (user, target) => {
+        // Active la réduction de dégâts
+        user.isDefending = true; 
+        
+        // MÉCANIQUE DE RÉCUPÉRATION : Se défendre permet de souffler
+        // On récupère 5% des HP Max et 5% des MP Max
+        let healHp = Math.floor(user.maxHp * 0.05);
+        let healMp = Math.floor(user.maxMp * 0.05);
+        
+        user.currentHp = Math.min(user.maxHp, user.currentHp + healHp);
+        user.currentMp = Math.min(user.maxMp, user.currentMp + healMp);
+
+        return { 
+            customMsg: ` se protège et reprend son souffle (+${healHp} PV / +${healMp} MP)` 
+        };
+    }),
+
+    // ... La suite de tes compétences (frappe_lourde, etc.) reste inchangée ...
+
 
     "frappe_lourde": new Skill("Frappe Lourde", 10, 2, "physique", "Gros Dégâts Physiques", (user, target) => {
         // Multiplicateur x2.5 (remplace l'ancienne formule)
@@ -52,14 +73,8 @@ const SKILL_DATABASE = {
 
     "soin_leger": new Skill("✨ Soin", 12, 3, "lumiere", "Restaure des PV", (user, target) => {
         let heal = 20 + Math.floor(user.int * 1.5);
-        target.currentHp = Math.min(target.maxHp, target.currentHp + heal);
+        user.currentHp = Math.min(user.maxHp, user.currentHp + heal);
         return heal; 
-    }),
-
-    "posture_defensive": new Skill("🛡️ Défense", 0, 0, "physique", "-50% Dégâts reçus (Active)", (user, target) => {
-        // Celui-ci reste spécial (géré dans game.js pour diviser les dégâts par 2)
-        user.isDefending = true; 
-        return "DEFENSE";
     }),
 
     "analyse": new Skill("👁️ Analyse", 0, 0, "physique", "Info Ennemi", (user, target) => {

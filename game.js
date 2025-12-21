@@ -10,7 +10,29 @@ class Game {
         if (resetBtn) resetBtn.onclick = () => this.hardReset();
         
         this.setupHeroStatsListener();
-
+        
+        
+        // --- AJOUT : FERMETURE DES MODALES AU CLIC EXTÉRIEUR ---
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                // 'e.target' est l'élément cliqué. 'modal' est le fond gris.
+                // Si on clique pile sur le fond gris (et pas sur le contenu à l'intérieur) :
+                if (e.target === modal) {
+                    
+                    // SÉCURITÉ : On empêche de fermer certaines fenêtres critiques en cliquant à côté
+                    // 1. Analysis : Car fermer doit finir le tour (logique spéciale)
+                    // 2. Class Selection : Car on doit choisir une classe
+                    // 3. Reward : Car on doit choisir une récompense
+                    const protectedModals = ['analysis-modal', 'class-selection-modal', 'reward-modal'];
+                    
+                    if (!protectedModals.includes(modal.id)) {
+                        modal.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        
         // --- NOUVELLE LOGIQUE DE DÉMARRAGE ---
         
         // 1. On essaie de charger une partie existante
@@ -397,12 +419,43 @@ class Game {
             return; 
         }
 
-        // --- ACTIVER LE COOLDOWN ---
         this.hero.triggerCooldown(skill);
-        const target = (skill.type === "lumiere" || skill.name.includes("Défense") || skill.name.includes("Analyse")) ? this.hero : this.monster;
-        
-        let result = skill.effect(this.hero, target);
 
+        // --- SIMPLIFICATION MAXIMALE ---
+        // On cible toujours le monstre.
+        // Si le sort est un soin (comme modifié dans skills.js), il ignorera cette cible
+        // et utilisera 'user' (toi) pour se soigner.
+        const target = this.monster; 
+        
+        // Exécution du sort
+        // Le Châtiment ira sur le monstre (car il utilise 'target')
+        // Le Soin ira sur toi (car il utilise 'user')
+        let result = skill.effect(this.hero, target);
+                // Animation d'attaque du Héros sur son image (player-sprite)
+        this.triggerAttackAnim('player-sprite', true);
+        // --- GESTION VISUELLE ---
+        if (typeof result === 'object' && result.dmg !== undefined) {
+            setTimeout(() => {
+                // On passe result.isCrit en 4ème argument !
+                this.spawnFloatingText('enemy-sprite', `-${result.dmg}`, result.type || "physique", result.isCrit);
+                
+                if (result.type !== "miss") { // On ne tremble pas si on a esquivé
+                    this.triggerHitEffect('enemy-sprite');
+                }
+            }, 200); 
+        } 
+
+        else if (skill.name.includes("Soin") || skill.name.includes("Lumière")) {
+             // C'est un soin (sur le joueur)
+             // Note : Il faut récupérer le montant soigné si possible, ou mettre un texte générique
+             // Dans ton skills.js, 'soin_leger' renvoie le montant heal.
+             if (typeof result === 'number') {
+                 this.spawnFloatingText('player-sprite', `+${result}`, "soin");
+             } else if (result.customMsg && result.dmg) {
+                 // Cas vampirisme ou soin + dégats
+             }
+        }
+        // ------------------------
         // --- Adaptation pour le nouvel objet result ---
         
         // Gestion du blocage ennemi (si result est un objet dégâts)
@@ -458,7 +511,24 @@ class Game {
 
         const target = (skill.name.includes("Soin") || skill.name.includes("Cri")) ? this.monster : this.hero;
         
+                // Animation d'attaque du Monstre
+        this.triggerAttackAnim('enemy-sprite', false);
+
         let result = skill.effect(this.monster, target);
+
+        // --- GESTION VISUELLE ---
+        if (typeof result === 'object' && result.dmg !== undefined) {
+            setTimeout(() => {
+                // Pareil ici, on passe result.isCrit
+                this.loatingText('player-sprite', `-${result.dmg}`, result.type || "physique", result.isCrit);
+                
+                if (result.type !== "miss") {
+                    this.triggerHitEffect('player-sprite');
+                }
+            }, 200);
+        }
+
+        // ------------------------
 
         // Gestion blocage héros
         if (typeof result === 'object' && this.hero.isDefending && target === this.hero) {
@@ -728,31 +798,40 @@ class Game {
         this.hardReset(); 
     }
 
-    logAction(name, skillName, result) {
-        // --- 1. GESTION DES MESSAGES PERSONNALISÉS (Nouveau) ---
+        logAction(name, skillName, result) {
+        if (typeof result === 'object' && result.type === "miss") {
+             this.log(`${name} attaque... mais la cible <b>ESQUIVE</b> ! 💨`);
+             return;
+        }
+        
+        // ... (Garde tes codes pour customMsg ici) ...
         if (typeof result === 'object' && result.customMsg) {
-            // S'il y a des dégâts avec le message (ex: poison)
-            if (result.dmg) {
-                this.log(`${name} lance ${skillName} : <b>${result.dmg}</b> dégâts${result.customMsg}`);
-            } 
-            // S'il n'y a PAS de dégâts (ex: buff résistance)
-            else {
-                this.log(`${name} utilise ${skillName} et ${result.customMsg}`);
+             // ... ton code existant ...
+        }
+        
+        // ... (Garde les autres codes BUFF/DEFENSE) ...
+
+        // Mise à jour du message de dégâts
+        if (typeof result === 'object' && result.dmg !== undefined) {
+            let msg = `${name} lance ${skillName} : `;
+            
+            if (result.isCrit) {
+                msg += `<b style="color:#ffeb3b; font-size:1.1em;">CRITIQUE ! -${result.dmg}</b>`;
+            } else {
+                msg += `<b>${result.dmg}</b> dégâts.`;
             }
+
+            if (result.isWeak) msg += ` <span style="color:#e74c3c;">(VULNÉRABLE !)</span>`;
+            else if (result.isResist) msg += ` <span style="color:#bdc3c7;">(Résistance...)</span>`;
+            
+            this.log(msg);
             return;
         }
-        // -------------------------------------------------------------
-        if (result === "BUFF") { this.log(`${name} utilise ${skillName} !`); return; }
-        if (result === "DEFENSE") { this.log(`${name} se met en posture défensive.`); return; }
-        if (result === "ANALYSE") return; 
-        if (typeof result === 'number') { this.log(`${name} utilise ${skillName} (+${result} PV)`); return; }
-
-        let msg = `${name} lance ${skillName} : <b>${result.dmg}</b> dégâts.`;
-        if (result.isWeak) msg += ` <span style="color:#e74c3c; font-weight:bold;">(VULNÉRABLE !)</span>`;
-        else if (result.isResist) msg += ` <span style="color:#bdc3c7; font-size:0.8em;">(Résistance...)</span>`;
-
-        this.log(msg);
+        
+        // Fallback
+        this.log(`${name} utilise ${skillName}.`);
     }
+
 
     setupHeroStatsListener() {
         const playerArea = document.getElementById('player-area');
@@ -816,7 +895,45 @@ class Game {
         `;
         modal.classList.remove('hidden');
     }
+    
+    renderStatusEffects(char, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = ""; // On nettoie
 
+        // 1. Afficher les Buffs de stats (ex: Force +)
+        char.activeBuffs.forEach(buff => {
+            const el = document.createElement("div");
+            // Si la valeur est positive = Buff, négative = Debuff
+            const type = buff.val > 0 ? "buff" : "debuff";
+            const symbol = buff.val > 0 ? "▲" : "▼";
+            
+            el.className = `status-icon ${type}`;
+            // Affiche : "STR ▲ (2)" pour dire Force augmenté, reste 2 tours
+            el.innerText = `${buff.stat.toUpperCase().slice(0,3)} ${symbol} (${buff.turns})`;
+            el.title = `${buff.name}: ${buff.val > 0 ? '+' : ''}${buff.val} (${buff.turns} tours)`;
+            container.appendChild(el);
+        });
+
+        // 2. Afficher les DoT (Poison, Saignement)
+        char.statusEffects.forEach(eff => {
+            const el = document.createElement("div");
+            el.className = "status-icon debuff"; // Souvent des debuffs
+            el.style.borderColor = "#9b59b6"; // Violet pour les DoT
+            el.style.color = "#9b59b6";
+            
+            // Icône selon le nom (rapide)
+            let icon = "💀";
+            if(eff.name.includes("Saignement")) icon = "🩸";
+            if(eff.name.includes("Brûlure")) icon = "🔥";
+            
+            el.innerText = `${icon} (${eff.duration})`;
+            el.title = `${eff.name}: -${eff.damage} PV/tour`;
+            container.appendChild(el);
+        });
+    }
+    
+    
     updateUI() {
         const waveSpan = document.getElementById('wave-count');
         if (waveSpan) waveSpan.innerText = this.wave;
@@ -827,6 +944,9 @@ class Game {
         document.getElementById('enemy-name').innerText = this.monster.name;
         document.getElementById('enemy-hp-text').innerText = `${this.monster.currentHp}/${this.monster.maxHp} PV`;
         document.getElementById('enemy-hp-bar').style.width = `${(this.monster.currentHp / this.monster.maxHp) * 100}%`;
+        this.renderStatusEffects(this.hero, 'player-effects');
+        this.renderStatusEffects(this.monster, 'enemy-effects');
+        
     }
 
     log(msg) {
@@ -834,7 +954,83 @@ class Game {
         logBox.innerHTML += `<p>${msg}</p>`;
         logBox.scrollTop = logBox.scrollHeight;
     }
+    
+        // --- NOUVELLES FONCTIONS VISUELLES ---
 
+// --- Dans game.js ---
+
+    spawnFloatingText(targetId, text, type = "physique", isCrit = false) {
+        const targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
+
+        const el = document.createElement("div");
+        el.innerText = text;
+        
+        let colorClass = `color-${type}`;
+        
+        // --- GESTION VISUELLE CRITIQUE & ESQUIVE ---
+        if (type === "miss") {
+            el.innerText = "ESQUIVE !";
+            el.style.color = "#bdc3c7"; // Gris clair
+            el.style.fontSize = "1rem";
+            el.style.fontStyle = "italic";
+        } 
+        else if (isCrit) {
+            el.innerText = text + " 💥"; // Ajout d'une icône
+            el.style.color = "#ffeb3b"; // Jaune vif
+            el.style.fontSize = "2.5rem"; // Beaucoup plus gros !
+            el.style.textShadow = "0 0 10px #e67e22"; // Effet "Glow"
+            el.style.zIndex = "10000";
+        } 
+        else {
+            // Cas normal
+            el.className = `floating-text ${colorClass}`;
+        }
+
+        // On garde la classe de base pour l'animation, mais on ajoute 'crit' si besoin
+        el.className = "floating-text " + (isCrit ? "" : colorClass);
+
+        // Positionnement (identique à avant)
+        const rect = targetEl.getBoundingClientRect();
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+
+        el.style.left = (rect.left + scrollX + rect.width / 2 - 20) + "px"; 
+        el.style.top = (rect.top + scrollY) + "px";
+
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    }
+
+
+    // 2. Fait trembler une cible (quand elle prend des dégâts)
+    triggerHitEffect(targetId) {
+        const el = document.getElementById(targetId);
+        if (!el) return;
+        
+        // Astuce pour relancer l'animation si elle est déjà jouée
+        el.classList.remove("shake-anim");
+        el.classList.remove("flash-red");
+        void el.offsetWidth; // Force le navigateur à recalculer (Reflow)
+        
+        el.classList.add("shake-anim");
+        el.classList.add("flash-red");
+    }
+
+    // 3. Fait bondir l'attaquant
+    triggerAttackAnim(attackerId, isHero) {
+        const el = document.getElementById(attackerId);
+        if(!el) return;
+        
+        const animClass = isHero ? "attack-hero" : "attack-enemy";
+        
+        el.classList.remove(animClass);
+        void el.offsetWidth; 
+        el.classList.add(animClass);
+    }
+
+    
+    
     saveGame() {
         if (!this.hero) return;
         const saveData = {
@@ -918,25 +1114,40 @@ class Game {
     
         // Dans game.js
 
-    processDoT(character) {
-        // On déclenche les effets stockés dans le personnage
+        processDoT(character) {
+        // 1. Calcul des effets (dégâts/expiration)
         const reports = character.triggerStatusEffects();
 
-        // On affiche le résultat dans le log
+        // 2. Identification de la cible pour les effets visuels
+        // Si le personnage est le héros, on vise 'player-sprite', sinon 'enemy-sprite'
+        const spriteId = (character === this.hero) ? 'player-sprite' : 'enemy-sprite';
+
+        // 3. Boucle sur les rapports d'effets
         reports.forEach(report => {
             if (report.expired) {
                 this.log(`${character.name} n'est plus affecté par ${report.effectName}.`);
             } else {
-                this.log(`${character.name} subit ${report.effectName} : <b>${report.dmg}</b> dégâts.`);
+                // Cas où l'effet inflige des dégâts (Poison, Saignement, etc.)
+                if (report.dmg > 0) {
+                    this.log(`${character.name} subit ${report.effectName} : <b>${report.dmg}</b> dégâts.`);
+                    
+                    // --- EFFETS VISUELS ---
+                    // Affiche "-10" au-dessus de la tête avec la couleur du type (ex: vert/violet)
+                    this.spawnFloatingText(spriteId, `-${report.dmg}`, report.type);
+                    
+                    // Fait trembler le sprite pour montrer la douleur
+                    this.triggerHitEffect(spriteId);
+                }
             }
         });
         
-        // Mise à jour visuelle des barres de vie
+        // 4. Mise à jour de l'interface (Barres de vie)
         this.updateUI();
 
-        // Vérifier si le perso meurt du poison !
+        // 5. Renvoie 'true' si le perso est vivant, 'false' s'il est mort
         return character.currentHp > 0;
     }
+
 
 } // --- FIN DE LA CLASSE GAME ---
 

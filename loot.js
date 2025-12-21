@@ -1,5 +1,5 @@
 // --- loot.js ---
-// Configuration des probabilités et des bonus de stats
+// Version "Sweet Spot" (Adaptée pour ~600 PV de base)
 
 // Configuration des probabilités (Total = 100%)
 const BASE_RARITY_CHANCE = {
@@ -9,40 +9,36 @@ const BASE_RARITY_CHANCE = {
     "legendary": 2
 };
 
-// Liste des Bonus de Stats possibles par rareté
-// --- loot.js ---
-
-// --- DANS loot.js ---
-
 const STAT_POOL = {
     "common": [
-        // On passe de +1 à +2 pour que même un tirage "nul" soit utile
+        // +2 reste bien pour le début de jeu
         { key: "str", val: 2, label: "Force Mineure", desc: "For + 2" },
         { key: "int", val: 2, label: "Intelligence Mineure", desc: "Int + 2"  },
-        // PV passe de 10 à 15
-        { key: "maxHp", val: 15, label: "Petit Boost Santé", desc: "Max PV + 15"  },
-        { key: "maxMp", val: 5, label: "Petit Boost de Mana", desc: "Max MP + 5"  }
+        // Adapté : +60 PV (environ 10% de la vie de base)
+        { key: "maxHp", val: 60, label: "Petit Boost Santé", desc: "Max PV + 60"  },
+        { key: "maxMp", val: 10, label: "Petit Boost de Mana", desc: "Max MP + 10"  }
     ],
     "rare": [
-        // On passe de +3 à +4
         { key: "str", val: 4, label: "Force Accrue", desc: "For + 4"  },
         { key: "int", val: 4, label: "Esprit Vif", desc: "Int + 4"  },
-        { key: "def", val: 2, label: "Peau de Fer", desc: "Def + 2"  }, // Def reste rare
-        { key: "maxHp", val: 30, label: "Vitalité", desc: "Max PV + 30"  },
-        { key: "maxMp", val: 15, label: "Source de Mana", desc: "Max MP + 15"  }
+        { key: "def", val: 2, label: "Peau de Fer", desc: "Def + 2"  }, 
+        // Adapté : +120 PV
+        { key: "maxHp", val: 120, label: "Vitalité", desc: "Max PV + 120"  },
+        { key: "maxMp", val: 25, label: "Source de Mana", desc: "Max MP + 25"  }
     ],
     "epic": [
-        // Légère augmentation
         { key: "str", val: 7, label: "Force de Titan", desc: "For + 7"  },
         { key: "int", val: 7, label: "Génie Magique", desc: "Int + 7"  },
-        { key: "maxMp", val: 25, label: "Mana evolution", desc: "Max MP + 25"  },
+        // Adapté : +250 PV
+        { key: "maxHp", val: 250, label: "Vitalité Héroïque", desc: "Max PV + 250"  },
+        { key: "maxMp", val: 50, label: "Mana evolution", desc: "Max MP + 50"  },
         { key: "magDef", val: 5, label: "Aura Protectrice", desc: "Def mag + 5"  },
         { key: "res_feu", val: 15, label: "Ignifugé", desc: "Res feu + 15"  },
         { key: "res_physique", val: 8, label: "Corps d'Acier", desc: "Res phy + 8"  }
     ],
     "legendary": [
-        // Les légendaires restent très forts
-        { key: "maxHp", val: 80, label: "Cœur de Dragon", desc: "Max PV + 80"  },
+        // Adapté : +500 PV (Presque une deuxième barre de vie)
+        { key: "maxHp", val: 500, label: "Cœur de Dragon", desc: "Max PV + 500"  },
         { key: "str", val: 12, label: "Puissance Divine", desc: "For + 12"  },
         { key: "int", val: 12, label: "Magie Divine", desc: "Int + 12"  },
         { key: "def", val: 8, label: "Invulnérabilité", desc: "Def + 8"  },
@@ -52,9 +48,6 @@ const STAT_POOL = {
     ]
 };
 
-
-
-// --- DÉPLACÉ DEPUIS SKILLS.JS ---
 // Liste des Sorts distribuables en récompense
 const SKILL_POOL = [
     // --- COMMUNS ---
@@ -113,4 +106,3 @@ const SKILL_POOL = [
     { key: "boule_magma", rarity: "legendary", classes: ["mage"] },
     { key: "paix_interieure", rarity: "legendary", classes: ["paladin", "mage"] }
 ];
-

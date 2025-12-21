@@ -126,26 +126,33 @@ class Character {
         // --- DANS classes.js ---
 
         // Cherche ce bloc dans la méthode createFromId :
+        // --- classes.js ---
+// Dans la méthode createFromId...
+
         if (type === "monster") {
-            // Équilibrage Monstres - VERSION CORRIGÉE
+            // Équilibrage Monstres - VERSION "TANKY"
             
-            // Ancien : 0.10 (10%) -> Nouveau : 0.06 (6% par vague)
-            // À la vague 20, le monstre aura x2.1 PV au lieu de x2.9
+            // 1. Les PV montent VITE (6% par vague). 
+            // Résultat : Les monstres deviennent durs à tuer, il faut gérer son mana.
             const hpMult = 1 + (wave - 1) * 0.06; 
             hp = Math.floor(data.maxHp * hpMult);
         
-            // Ancien : 0.03 (3%) -> Nouveau : 0.02 (2% par vague)
-            const strMult = 1 + (wave - 1) * 0.02;
+            // 2. Les Dégâts (Force) montent LENTEMENT (1.5% par vague).
+            // Résultat : Le joueur ne se fait pas one-shot à la vague 50.
+            const strMult = 1 + (wave - 1) * 0.015;
             str = Math.floor(data.str * strMult);
+            
+            // L'intelligence suit la force
             int = Math.floor((data.int || 1) * strMult);
         
-            // Bonus de défense : On divise par 8 au lieu de 5 pour qu'elle monte moins vite
-            const bonusDef = Math.floor((wave - 1) / 8); 
+            // 3. Défense : Augmente très lentement
+            const bonusDef = Math.floor((wave - 1) / 5); 
             def = data.def + bonusDef;
             magDef = (data.magDef || 0) + bonusDef;
         
             xp = Math.floor(data.xpReward * (1 + (wave * 0.1)));
         }
+
 
 
         const newChar = new Character(data.name, hp, data.maxMp, str, def, int, magDef, data.resistances);
@@ -162,30 +169,41 @@ class Character {
         return newChar;
     }
 
-// --- Dans classes.js, remplace la méthode receiveDamage par celle-ci ---
+// --- Dans classes.js, remplace la méthode receiveDamage ---
 
     receiveDamage(rawAmount, type) {
-        // 1. Déterminer quel type de défense utiliser
-        // Si c'est physique => Def. Si c'est magique (feu, eau, etc.) => MagDef
+        // --- NOUVEAU : SYSTÈME D'ESQUIVE (5% de chance de base + bonus Dex/Vitesse caché) ---
+        // Les voleurs ou monstres rapides pourraient avoir plus, on reste simple ici (5%)
+        const dodgeChance = 0.05; 
+        if (Math.random() < dodgeChance) {
+            return {
+                dmg: 0,
+                type: "miss", // Type spécial pour l'affichage
+                customMsg: " esquive l'attaque avec agilité !"
+            };
+        }
+
+        // --- NOUVEAU : SYSTÈME DE CRITIQUE (5% de chance) ---
+        // On simule un "Point Faible" touché
+        let isCrit = false;
+        if (Math.random() < 0.05) { // 5% de chance de Critique
+            rawAmount = Math.floor(rawAmount * 1.5); // Dégâts x1.5
+            isCrit = true;
+        }
+
+        // --- Calcul Classique (Armure) ---
         const isPhysical = (type === "physique");
         const armor = isPhysical ? this.def : this.magDef;
 
-        // 2. Calcul de la Réduction par l'Armure (Formule MOBA/MMO)
-        // Facteur de réduction = K / (K + Armure). Ici K = 50.
-        // Exemple : 50 Def => 50 / (50 + 50) = 0.5 (50% dégâts reçus)
         const ARMOR_CONSTANT = 50;
         const mitigationFactor = ARMOR_CONSTANT / (ARMOR_CONSTANT + armor);
-
         let damageAfterArmor = Math.floor(rawAmount * mitigationFactor);
 
-        // 3. Gestion des Résistances Élémentaires (Pourcentage)
+        // --- Calcul Résistances ---
         const resPercent = this.resistances[type] || 0;
         const elementFactor = 1 - (resPercent / 100);
-        
         let finalDamage = Math.floor(damageAfterArmor * elementFactor);
         
-        // Sécurité : On s'assure qu'il y a toujours au moins 1 dégât (chip damage)
-        // Sauf si l'immunité élémentaire est totale (100% res)
         if (finalDamage < 1 && resPercent < 100) finalDamage = 1; 
         
         this.currentHp -= finalDamage;
@@ -194,10 +212,12 @@ class Character {
         return {
             dmg: finalDamage,
             isWeak: resPercent < 0,
-            isResist: resPercent > 0 || mitigationFactor < 0.5, // On considère "résistant" si l'armure réduit de >50%
+            isResist: resPercent > 0 || mitigationFactor < 0.5,
+            isCrit: isCrit, // On renvoie l'info si c'est un critique
             type: type
         };
     }
+
 
     // --- UTILS ---
     learnSkill(skillKey) {

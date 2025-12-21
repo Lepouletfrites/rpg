@@ -395,3 +395,103 @@ body {
 }
 
 
+/* --- EFFETS VISUELS (Juice) --- */
+
+/* 1. Texte Flottant (Dégâts) */
+.floating-text {
+    position: absolute;
+    font-family: 'Press Start 2P', cursive;
+    font-weight: bold;
+    font-size: 1.5rem; /* Gros chiffres ! */
+    pointer-events: none; /* Permet de cliquer à travers */
+    z-index: 9999;
+    text-shadow: 2px 2px 0 #000; /* Contour noir pour lisibilité */
+    animation: floatUp 0.8s ease-out forwards; /* L'animation dure 0.8s */
+}
+
+/* L'animation qui fait monter le texte et disparaître */
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    20% { transform: translateY(-20px) scale(1.5); opacity: 1; } /* Petit effet de "pop" */
+    100% { transform: translateY(-80px) scale(1); opacity: 0; }
+}
+
+/* Couleurs selon le type */
+.color-physique { color: #e74c3c; } /* Rouge */
+.color-magique { color: #9b59b6; }  /* Violet */
+.color-feu { color: #e67e22; }      /* Orange */
+.color-eau { color: #3498db; }      /* Bleu */
+.color-terre { color: #27ae60; }    /* Vert Fonce */
+.color-electrique { color: #f1c40f; } /* Jaune */
+.color-lumiere { color: #fffacd; text-shadow: 0 0 5px #f1c40f; } /* Brillant */
+.color-tenebres { color: #8e44ad; } /* Violet foncé */
+.color-soin { color: #2ecc71; }     /* Vert clair */
+
+
+/* 2. Animation de Secousse (Quand on est touché) */
+.shake-anim {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* 3. Animation d'Attaque (Bond vers l'avant) */
+/* Pour le héros (vers la droite/haut si desktop/mobile) */
+.attack-hero { animation: lungeRight 0.2s ease-in-out; }
+@keyframes lungeRight { 
+    0% { transform: translateX(0); } 
+    50% { transform: translateX(30px); } 
+    100% { transform: translateX(0); } 
+}
+
+/* Pour le monstre (vers la gauche) */
+.attack-enemy { animation: lungeLeft 0.2s ease-in-out; }
+@keyframes lungeLeft { 
+    0% { transform: translateX(0); } 
+    50% { transform: translateX(-30px); } 
+    100% { transform: translateX(0); } 
+}
+
+/* Flash Rouge (Quand on prend des dégâts critiques ou forts) */
+.flash-red {
+    animation: flashRed 0.3s;
+}
+@keyframes flashRed {
+    0% { filter: none; }
+    50% { filter: sepia(1) saturate(5) hue-rotate(-50deg); } /* Filtre rouge */
+    100% { filter: none; }
+}
+
+/* --- Ajout dans style.css --- */
+
+/* Conteneur des icônes d'effets (Buffs/Debuffs) */
+.status-effects-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 5px;
+    min-height: 24px; /* Garde la place même si vide */
+    flex-wrap: wrap;
+}
+
+/* L'icône individuelle */
+.status-icon {
+    font-size: 0.8rem;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #555;
+    cursor: help;
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+}
+
+/* Couleurs selon le type d'effet (optionnel mais joli) */
+.status-icon.buff { border-color: #2ecc71; color: #2ecc71; } /* Vert */
+.status-icon.debuff { border-color: #e74c3c; color: #e74c3c; } /* Rouge */
