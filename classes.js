@@ -122,21 +122,31 @@ class Character {
 
         if (type === "hero") {
             hp = data.maxHp; str = data.str; def = data.def; int = data.int || 1; magDef = data.magDef || 0;
-        } else {
-            // Équilibrage Monstres
-            const hpMult = 1 + (wave - 1) * 0.10; 
-            hp = Math.floor(data.maxHp * hpMult);
+        } 
+        // --- DANS classes.js ---
 
-            const strMult = 1 + (wave - 1) * 0.03;
+        // Cherche ce bloc dans la méthode createFromId :
+        if (type === "monster") {
+            // Équilibrage Monstres - VERSION CORRIGÉE
+            
+            // Ancien : 0.10 (10%) -> Nouveau : 0.06 (6% par vague)
+            // À la vague 20, le monstre aura x2.1 PV au lieu de x2.9
+            const hpMult = 1 + (wave - 1) * 0.06; 
+            hp = Math.floor(data.maxHp * hpMult);
+        
+            // Ancien : 0.03 (3%) -> Nouveau : 0.02 (2% par vague)
+            const strMult = 1 + (wave - 1) * 0.02;
             str = Math.floor(data.str * strMult);
             int = Math.floor((data.int || 1) * strMult);
-
-            const bonusDef = Math.floor((wave - 1) / 5); 
+        
+            // Bonus de défense : On divise par 8 au lieu de 5 pour qu'elle monte moins vite
+            const bonusDef = Math.floor((wave - 1) / 8); 
             def = data.def + bonusDef;
             magDef = (data.magDef || 0) + bonusDef;
-
+        
             xp = Math.floor(data.xpReward * (1 + (wave * 0.1)));
         }
+
 
         const newChar = new Character(data.name, hp, data.maxMp, str, def, int, magDef, data.resistances);
 

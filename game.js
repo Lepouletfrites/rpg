@@ -706,11 +706,11 @@ class Game {
         // Cela remettra la Force à la normale avant de sauvegarder ou de continuer
         
         // 2. Soin PV (30% du Max)
-        const healHp = Math.floor(this.hero.maxHp * 0.3);
+        const healHp = Math.floor(this.hero.maxHp * 0.5);
         this.hero.currentHp = Math.min(this.hero.maxHp, this.hero.currentHp + healHp);
 
         // 3. Récupération MP (30% du Max)
-        const healMp = Math.floor(this.hero.maxMp * 0.3);
+        const healMp = Math.floor(this.hero.maxMp * 0.4);
         this.hero.currentMp = Math.min(this.hero.maxMp, this.hero.currentMp + healMp);
 
         // 4. Logs et suite

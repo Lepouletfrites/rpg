@@ -12,42 +12,46 @@ const BASE_RARITY_CHANCE = {
 // Liste des Bonus de Stats possibles par rareté
 // --- loot.js ---
 
+// --- DANS loot.js ---
+
 const STAT_POOL = {
     "common": [
-        { key: "str", val: 1, label: "Force Mineure", desc: "For + 1" },
-        { key: "int", val: 1, label: "Intelligence Mineure", desc: "Int + 1"  },
-        { key: "maxHp", val: 10, label: "Petit Boost Santé", desc: "Max PV + 10"  },
+        // On passe de +1 à +2 pour que même un tirage "nul" soit utile
+        { key: "str", val: 2, label: "Force Mineure", desc: "For + 2" },
+        { key: "int", val: 2, label: "Intelligence Mineure", desc: "Int + 2"  },
+        // PV passe de 10 à 15
+        { key: "maxHp", val: 15, label: "Petit Boost Santé", desc: "Max PV + 15"  },
         { key: "maxMp", val: 5, label: "Petit Boost de Mana", desc: "Max MP + 5"  }
     ],
     "rare": [
-        { key: "str", val: 3, label: "Force Accrue", desc: "For + 3"  },
-        { key: "int", val: 3, label: "Esprit Vif", desc: "Int + 3"  },
-        { key: "def", val: 2, label: "Peau de Fer", desc: "Def + 2"  },
-        { key: "maxHp", val: 25, label: "Vitalité", desc: "Max PV + 25"  },
-        { key: "maxMp", val: 10, label: "Source de Mana", desc: "Max MP + 10"  }
+        // On passe de +3 à +4
+        { key: "str", val: 4, label: "Force Accrue", desc: "For + 4"  },
+        { key: "int", val: 4, label: "Esprit Vif", desc: "Int + 4"  },
+        { key: "def", val: 2, label: "Peau de Fer", desc: "Def + 2"  }, // Def reste rare
+        { key: "maxHp", val: 30, label: "Vitalité", desc: "Max PV + 30"  },
+        { key: "maxMp", val: 15, label: "Source de Mana", desc: "Max MP + 15"  }
     ],
     "epic": [
-        { key: "str", val: 5, label: "Force de Titan", desc: "For + 5"  },
-        { key: "int", val: 5, label: "Génie Magique", desc: "Int + 5"  },
-        { key: "maxMp", val: 20, label: "Mana evolution", desc: "Max MP + 20"  },
-        { key: "magDef", val: 4, label: "Aura Protectrice", desc: "Def mag + 4"  },
-        
-        // --- NOUVEAU : Résistances Épiques (+10%) ---
-        { key: "res_feu", val: 10, label: "Ignifugé", desc: "Res feu + 10"  },
-        { key: "res_physique", val: 5, label: "Corps d'Acier", desc: "Res phy + 5"  }
+        // Légère augmentation
+        { key: "str", val: 7, label: "Force de Titan", desc: "For + 7"  },
+        { key: "int", val: 7, label: "Génie Magique", desc: "Int + 7"  },
+        { key: "maxMp", val: 25, label: "Mana evolution", desc: "Max MP + 25"  },
+        { key: "magDef", val: 5, label: "Aura Protectrice", desc: "Def mag + 5"  },
+        { key: "res_feu", val: 15, label: "Ignifugé", desc: "Res feu + 15"  },
+        { key: "res_physique", val: 8, label: "Corps d'Acier", desc: "Res phy + 8"  }
     ],
     "legendary": [
-        { key: "maxHp", val: 50, label: "Cœur de Dragon", desc: "Max PV + 50"  },
-        { key: "str", val: 8, label: "Puissance Divine", desc: "For + 8"  },
-        { key: "int", val: 8, label: "Magie Divine", desc: "Int + 8"  },
-        { key: "def", val: 5, label: "Invulnérabilité", desc: "Def + 5"  },
-        { key: "magDef", val: 5, label: "Bouclier anti sorts", desc: "Def magique + 5"  },
-        
-        // --- NOUVEAU : Résistances Légendaires (+20%) ---
-        { key: "res_tenebres", val: 20, label: "Lumière Intérieure", desc: "Res tene + 20"  },
-        { key: "res_physique", val: 10, label: "Peau de Diamant", desc: "Res phy + 10"  }
+        // Les légendaires restent très forts
+        { key: "maxHp", val: 80, label: "Cœur de Dragon", desc: "Max PV + 80"  },
+        { key: "str", val: 12, label: "Puissance Divine", desc: "For + 12"  },
+        { key: "int", val: 12, label: "Magie Divine", desc: "Int + 12"  },
+        { key: "def", val: 8, label: "Invulnérabilité", desc: "Def + 8"  },
+        { key: "magDef", val: 8, label: "Bouclier anti sorts", desc: "Def mag + 8"  },
+        { key: "res_tenebres", val: 25, label: "Lumière Intérieure", desc: "Res tene + 25"  },
+        { key: "res_physique", val: 15, label: "Peau de Diamant", desc: "Res phy + 15"  }
     ]
 };
+
 
 
 // --- DÉPLACÉ DEPUIS SKILLS.JS ---

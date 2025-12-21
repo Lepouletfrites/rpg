@@ -117,13 +117,13 @@ const MONSTERS_DATA = {
     // =================================================================
 
     "pretre_corrompu": {
-        name: "Prêtre Corrompu", maxHp: 80, maxMp: 80, str: 4, def: 8, int: 12, magDef: 17, xpReward: 100,
+        name: "Prêtre Corrompu", maxHp: 80, maxMp: 80, str: 4, def: 8, int: 13, magDef: 20, xpReward: 100,
         minWave: 15, maxWave: 55, spawnWeight: 50,
         skills: ["coup_basique", "soin_leger", "choc_mental"], // Ajout coup_basique
         resistances: { lumiere: 20, tenebres: 20, physique: -10 }
     },
     "orc": {
-        name: "Orc", maxHp: 100, maxMp: 20, str: 14, def: 13, int: 2, magDef: 5, xpReward: 110,
+        name: "Orc", maxHp: 100, maxMp: 20, str: 16, def: 15, int: 2, magDef: 5, xpReward: 110,
         minWave: 20, maxWave: 60, spawnWeight: 70,
         skills: ["coup_basique", "cri", "frappe_lourde"],
         resistances: { physique: 15, feu: -20 }
@@ -147,13 +147,13 @@ const MONSTERS_DATA = {
         resistances: { physique: 80, tenebres: 100, poison: 100, lumiere: -50 }
     },
     "gargouille": {
-        name: "Gargouille", maxHp: 150, maxMp: 0, str: 12, def: 40, int: 5, magDef: 30, xpReward: 140,
+        name: "Gargouille", maxHp: 150, maxMp: 0, str: 16, def: 40, int: 5, magDef: 30, xpReward: 140,
         minWave: 35, maxWave: 80, spawnWeight: 50,
         skills: ["coup_basique", "peau_de_pierre", "frappe_lourde"], // Ajout coup_basique
         resistances: { physique: 40, feu: 30, terre: 50 }
     },
     "assassin_drow": {
-        name: "Assassin Drow", maxHp: 60, maxMp: 40, str: 25, def: 10, int: 10, magDef: 12, xpReward: 150,
+        name: "Assassin Drow", maxHp: 90, maxMp: 40, str: 25, def: 10, int: 10, magDef: 12, xpReward: 150,
         minWave: 35, maxWave: 85, spawnWeight: 40,
         skills: ["coup_basique", "attaque_sournoise", "dague_poison", "camouflage"], // Ajout coup_basique
         resistances: { tenebres: 30 }
@@ -305,7 +305,7 @@ const MONSTERS_DATA = {
     // =================================================================
 
     "dragonnet": {
-        name: "Dragonnet (Boss)", maxHp: 200, maxMp: 100, str: 10, def: 25, int: 10, magDef: 20, xpReward: 500,
+        name: "Dragonnet (Boss)", maxHp: 200, maxMp: 100, str: 15, def: 20, int: 15, magDef: 20, xpReward: 500,
         minWave: 15, maxWave: 50, spawnWeight: 3, 
         skills: ["morsure", "souffle_feu", "cri"], // Morsure suffit
         resistances: { feu: 50, physique: 10 }
