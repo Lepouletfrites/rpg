@@ -21,6 +21,14 @@ body {
     margin: 0;
     padding: 10px;
     box-sizing: border-box;
+    /* 1. Bloque le "Tirer pour rafraîchir" */
+    overscroll-behavior-y: contain;
+
+    /* 2. Empêche de sélectionner le texte (comme sur un doc Word) */
+    user-select: none;
+    -webkit-user-select: none; /* Pour Safari/iOS */
+    -webkit-touch-callout: none; /* Bloque le menu contextuel au clic long */
+
 }
 
 /* Mise à jour du bandeau d'info pour inclure le bouton */
