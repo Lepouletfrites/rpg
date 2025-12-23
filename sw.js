@@ -1,5 +1,5 @@
 // sw.js
-const CACHE_NAME = 'rpg-js-v2';
+const CACHE_NAME = 'rpg-js-v3';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
