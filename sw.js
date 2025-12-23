@@ -1,5 +1,5 @@
-// sw.js
-const CACHE_NAME = 'rpg-js-v3';
+// sw.js - VERSION FORCE UPDATE
+const CACHE_NAME = 'rpg-js-v4'; // Pense à changer ce numéro à chaque modif !
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -14,8 +14,11 @@ const ASSETS_TO_CACHE = [
     './icon-512.png'
 ];
 
-// 1. Installation du Service Worker (Mise en cache des fichiers)
+// 1. Installation : On force l'attente à zéro
 self.addEventListener('install', (event) => {
+    // Cette ligne force la nouvelle version à s'installer immédiatement
+    self.skipWaiting(); 
+    
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             console.log('[Service Worker] Mise en cache des fichiers');
@@ -24,7 +27,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// 2. Activation (Nettoyage des vieux caches si on change de version)
+// 2. Activation : On prend le contrôle tout de suite
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keyList) => {
@@ -34,6 +37,21 @@ self.addEventListener('activate', (event) => {
                     return caches.delete(key);
                 }
             }));
+        }).then(() => {
+            // Cette ligne force la nouvelle version à contrôler la page active
+            return self.clients.claim();
+        })
+    );
+});
+
+// 3. Fetch : Stratégie Cache First, mais on pourrait changer pour Network First
+self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+        })
+    );
+});
         })
     );
 });
