@@ -6,7 +6,7 @@
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
   "description": "Un RPG tactique au tour par tour en JavaScript.",
-  "orientation": "portrait",
+  "orientation": "any",
   "icons": [
     {
       "src": "icon-192.png",
